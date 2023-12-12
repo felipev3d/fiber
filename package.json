@@ -1,0 +1,40 @@
+{
+  "name": "three-fiber-test",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host --port 3000",
+    "build": "vite build",
+    "lint": "eslint . --ext js,jsx --report-unused-disable-directives --max-warnings 0",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@nodetoy/react-nodetoy": "^0.1.24",
+    "@react-three/drei": "^9.88.15",
+    "@react-three/fiber": "^8.15.11",
+    "@react-three/xr": "^5.7.1",
+    "@types/three": "^0.158.2",
+    "glsl-specular-cook-torrance": "^2.0.1",
+    "leva": "^0.9.35",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "three": "^0.158.0",
+    "three-stdlib": "^2.28.5",
+    "verge3d": "^4.5.0",
+    "vite-plugin-glsl": "^1.2.0"
+  },
+  "devDependencies": {
+    "@types/react": "^18.2.15",
+    "@types/react-dom": "^18.2.7",
+    "@vitejs/plugin-react": "^4.0.3",
+    "autoprefixer": "^10.4.16",
+    "eslint": "^8.45.0",
+    "eslint-plugin-react": "^7.32.2",
+    "eslint-plugin-react-hooks": "^4.6.0",
+    "eslint-plugin-react-refresh": "^0.4.3",
+    "postcss": "^8.4.31",
+    "tailwindcss": "^3.3.5",
+    "vite": "^4.4.5"
+  }
+}
