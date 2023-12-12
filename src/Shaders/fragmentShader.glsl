@@ -24,8 +24,7 @@ uniform vec2 scale1;
 uniform vec3 lightPositions[3];
 uniform vec3 lightColors[3];
 uniform float exposure;
-
-uniform float time;
+ 
 // ----------------------------------------------------------------------------
 
 void main() {

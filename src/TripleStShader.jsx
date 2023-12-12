@@ -117,7 +117,7 @@ const TripleStShader = ({
 
             },
             vertexShader: vertexShader,
-            fragmentShader:     fragmentShader2,
+            fragmentShader:     fragmentShader,
         });
 
        
