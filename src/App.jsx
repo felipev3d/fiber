@@ -1,26 +1,14 @@
 
 import * as THREE from 'three'
-import { memo, useRef, forwardRef } from 'react'
+import { memo, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import { Canvas, useLoader, useThree } from '@react-three/fiber'
 import { Grid, Center, AccumulativeShadows, RandomizedLight, Environment, useGLTF, CameraControls, EnvironmentCube, SpotLight, Box, SoftShadows, useTexture } from '@react-three/drei'
 import { useControls, button, buttonGroup, folder } from 'leva'
-import { suspend } from 'suspend-react'
 import { GLTFLoader, USDZExporter } from 'three-stdlib'
-import { Object3D } from 'three'
-import TripleStShader from './TripleStShader'
-import { TextureLoader } from 'three'
-import { XR, XRButton } from '@react-three/xr'
 
 
 
 const { DEG2RAD } = THREE.MathUtils
-const y = 1
-const dx = 1.0
-const ligthPosition = [
-  [-1 * dx, y, -1 * dx],
-  [-1 * dx, y + .5, 1 * dx],
-  [1 * dx, y - .5, 1 * dx]
-]
 
 
 
@@ -31,20 +19,7 @@ export default function App() {
       <Canvas shadows camera={{ position: [0, 0, 5], fov: 60 }}>
 
         <Scene />
-        {
-          ligthPosition.map((position, index) => {
-            return <Box
-
-              args={[0.1, 0.1, 0.1]}                // Args for the buffer geometry
-              scale={[1, 1, 1]}     // All THREE.Mesh props are valid
-              material={new THREE.MeshLambertMaterial({ color: 'rgb(255,255,255)', emissive: 0xffffff })}
-              position={position}
-            />
-          })
-        }
-
-        <Model ligthPosition={ligthPosition} />
-
+        <Model />
 
       </Canvas >
     </>
@@ -166,12 +141,14 @@ function Scene() {
 
 
 
+
   return (
     <>
       <group position-y={-0.5}>
-        <Environment preset="studio" />
+        {/* <Environment preset="studio" /> */}
         <Ground />
-
+        <pointLight position={[.7, .7, .7]} intensity={6} />
+        <ambientLight intensity={5} />
         <CameraControls
           ref={cameraControlsRef}
           minDistance={minDistance}
@@ -220,36 +197,52 @@ const fabricData = [
     ratio: 0.6165312
   }
 ]
-const Model = ({ ligthPosition }) => {
+
+const stichTypes = {
+  "French Seam": ['French_Seam_1_BaseColor.jpg', 'French_Seam_1_Normal.png'],
+  "Top Stitch": ['Single_Top_Stitch_Medium_1_BaseColor.jpg', 'Single_Top_Stitch_Medium_1_Normal.png'],
+  "Double Top Stitch": ['Double_Top_Stitch_Medium_1_BaseColor.jpg', 'Double_Top_Stitch_Medium_1_Normal.png'],
+}
+
+const Model = () => {
   const { scene } = useThree()
-  const path = '/A1.gltf'
-  const path2 = `https://apistorage.v2fineinteriors.app/components/A1_BC_SH17_DT8_T1_PLD_36x8x29_TS1.gltf`
+  const path = '/A10_BC_SH18_PL_T1_PL_48x6x20_MULTI.gltf'
   const gltf = useLoader(GLTFLoader, path)
-  // material is  myShaderMaterial
-  const [colorMap, normalMap, roughnessMap] = useTexture([
+  const [_colorMap, set_colorMap] = useState(stichTypes['Double Top Stitch'][0])
+  const [_normalMap, set_normalMap] = useState(stichTypes['Double Top Stitch'][1])
+
+  const [colorMap, normalMap, roughnessMap, stColor, stNormal] = useTexture([
     fabricData[0].baseColor,
     fabricData[0].normal,
     fabricData[0].roughness,
-  ],
-    (loader) => {
+    _colorMap, _normalMap
 
-      Object.keys(loader).forEach(key => {
-
-        console.log(loader[key])
-        loader[key].wrapS = loader[key].wrapT = THREE.RepeatWrapping;
-        loader[key].repeat.set(15, 15)
-
-
-      })
-    }
+  ]
   );
+  useLayoutEffect(() => {
+    colorMap.colorSpace = THREE.SRGBColorSpace;
+    normalMap.colorSpace = THREE.NoColorSpace;
+    roughnessMap.colorSpace = THREE.NoColorSpace;
+    stColor.colorSpace = THREE.SRGBColorSpace;
+    stNormal.colorSpace = THREE.NoColorSpace;
 
+    colorMap.wrapS = colorMap.wrapT = THREE.RepeatWrapping;
+    normalMap.wrapS = normalMap.wrapT = THREE.RepeatWrapping;
+    roughnessMap.wrapS = roughnessMap.wrapT = THREE.RepeatWrapping;
+    stColor.wrapS = stColor.wrapT = THREE.RepeatWrapping;
+    stNormal.wrapS = stNormal.wrapT = THREE.RepeatWrapping;
+
+
+    colorMap.repeat.set(fabricData[0].scale, fabricData[0].scale);
+    normalMap.repeat.set(fabricData[0].scale, fabricData[0].scale);
+    roughnessMap.repeat.set(fabricData[0].scale, fabricData[0].scale);
+    return () => [colorMap, normalMap, roughnessMap].forEach(map => map.dispose());
+  }, [colorMap]);
 
 
   const controls = useControls({
 
     StandarMaterial: folder({
-
       roughness: { value: 0.1, min: 0, max: 1, step: 0.01 },
 
       envMapIntensity: { value: 1, min: 0, max: 1, step: 0.01 },
@@ -260,97 +253,83 @@ const Model = ({ ligthPosition }) => {
       clearcoatNormalScale: [0, 0]
     }),
   })
+  { console.log('gltf,gltf,gltf', gltf.scene.children) }
+
+  const props = useMemo(() => {
+    return {
+      map: colorMap,
+      normalMap,
+      roughnessMap,
+      controls
+    }
+  }, [colorMap, normalMap, roughnessMap, controls])
+
+  const stProps = useMemo(() => {
+
+    return {
+      map: stColor,
+      normalMap: stNormal,
+      blending: THREE.NormalBlending,
+      transparent: true,
+      side: THREE.FrontSide,
+      opacity: 0.9,
+      alphaTest: 0.5,
+      alphaMap: stNormal,
+      normalMapType: THREE.NormalBlending,
+      alphaToCoverage: true,
+
+    }
+  }, [stColor, stNormal])
 
   return (
-
     <group>
       {
+        gltf.scene.children.map((obj, index) => {
+          return obj.isMesh
+            ? obj.name.includes('_STT1') &&
+            <mesh
+              key={index}
+              geometry={obj.geometry}
+              position={obj.position}
+              rotation={obj.rotation}
+              scale={[1.0003, 1.0003, 1.0003]}
+            >
+              <meshPhysicalMaterial
+                {...stProps}
+              />
+            </mesh>
 
-        Object.keys(gltf.nodes).map((key, __index) => {
-          gltf.nodes[key].receiveShadows = true
-          gltf.nodes[key].castShadows = true
-          const _index = 0
-          return key.includes("A1_A_") &&
-            gltf.nodes[key].hasOwnProperty("geometry")
-            ? null
-            :
-            gltf.nodes[key].children.map((child, index) => {
-              // if is divisible by 2 then is a 0 else 1
-              const _index = !index % 2 === 0 ? 0 : 1
-
-              return < mesh key={"s1" + _index + index}
-                position={child.position}
-                onClick={(w) => {
-                  console.log(w)
-                }}
-                geometry={child.geometry}>
-                {Object.keys(child.geometry.attributes).includes('uv3') ?
-                  < TripleStShader
-
-                    materialPaths={[
-                      fabricData[_index].baseColor,
-                      fabricData[_index].normal,
-                      fabricData[_index].roughness]}
-                    stPats={["/Double_Top_Stitch_Medium_1_BaseColor.jpg",
-                      "/Double_Top_Stitch_Medium_1_Normal.png"
-                    ]}
-                    scale={fabricData[_index].scale}
-                    ratio={fabricData[_index].ratio}
-                    ligthPosition={ligthPosition}
+            : obj.isGroup &&
+            <group key={index + 'group'} position={obj.position} rotation={obj.rotation} scale={obj.scale}>
+              {obj.children.map((child, index) => {
+                return <mesh
+                  key={index}
+                  geometry={child.geometry}
+                  position={child.position}
+                  rotation={child.rotation}
+                  scale={child.scale}
+                >
+                  <meshPhysicalMaterial
+                    {...props}
+                    emissive={new THREE.Color(0x000000)}
+                    specularIntensity={0.5}
+                    ior={1.45}
+                    iridescence={0}
+                    iridescenceIntensity={1.1}
+                    sheen={1}
+                    reflectivity={0.62}
+                    roughness={1}
                   />
-                  :
-
-                  <>
-                    < meshPhysicalMaterial
-                      map={colorMap}
-                      clearcoatNormalMap={normalMap}
-                      roughnessMap={roughnessMap}
-                      roughness={controls.roughness}
-
-                      clearcoatNormalScale={[1, 1]}
-
-                      envMapIntensity={controls.envMapIntensity}
-                      clearcoat={controls.clearcoat}
-                      clearcoatRoughness={controls.clearcoatRoughness}
-                      reflectivity={controls.reflectivity}
-                      refractionRatio={controls.refractionRatio}
-
-
-                    />
-                    <SoftShadows /></>
-
-
-
-
-
-
-
-
-
-                }
-              </mesh>
-            }
-            )
-
-
-
-
-
-
+                </mesh>
+              })}
+            </group>
 
         })
       }
 
+    </group>
 
-
-
-
-    </group >
   )
 }
 
-const Shadows = memo(() => (
-  <AccumulativeShadows temporal frames={100} color="#9d4b4b" colorBlend={0.5} alphaTest={0.9} scale={20}>
-    {/* <RandomizedLight amount={8} radius={4} position={[5, 5, -10]} /> */}
-  </AccumulativeShadows>
-))
+
