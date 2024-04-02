@@ -17,7 +17,7 @@ const { DEG2RAD } = THREE.MathUtils
 export default function App() {
   return (
     <>
-      <Canvas shadows camera={{ position: [0, 0, 1], fov: 20 }}>
+      <Canvas shadows camera={{ position: [0, 0, 3], fov: 20 }}>
 
         <Scene />
         <Model />
@@ -47,67 +47,67 @@ function Scene() {
             '/-2': () => cameraControlsRef.current?.zoom(-camera.zoom / 2, true)
           }
         }),
-        minDistance: { value: 0 },
-        moveTo: folder(
-          {
-            vec1: { value: [3, 5, 2], label: 'vec' },
-            'moveTo(…vec)': button((get) => cameraControlsRef.current?.moveTo(...get('moveTo.vec1'), true))
-          },
-          { collapsed: true }
-        ),
-        'fitToBox(mesh)': button(() => cameraControlsRef.current?.fitToBox(meshRef.current, true)),
-        setPosition: folder(
-          {
-            vec2: { value: [-5, 2, 1], label: 'vec' },
-            'setPosition(…vec)': button((get) => cameraControlsRef.current?.setPosition(...get('setPosition.vec2'), true))
-          },
-          { collapsed: true }
-        ),
-        setTarget: folder(
-          {
-            vec3: { value: [3, 0, -3], label: 'vec' },
-            'setTarget(…vec)': button((get) => cameraControlsRef.current?.setTarget(...get('setTarget.vec3'), true))
-          },
-          { collapsed: true }
-        ),
-        setLookAt: folder(
-          {
-            vec4: { value: [1, 2, 3], label: 'position' },
-            vec5: { value: [1, 1, 0], label: 'target' },
-            'setLookAt(…position, …target)': button((get) => cameraControlsRef.current?.setLookAt(...get('setLookAt.vec4'), ...get('setLookAt.vec5'), true))
-          },
-          { collapsed: true }
-        ),
-        lerpLookAt: folder(
-          {
-            vec6: { value: [-2, 0, 0], label: 'posA' },
-            vec7: { value: [1, 1, 0], label: 'tgtA' },
-            vec8: { value: [0, 2, 5], label: 'posB' },
-            vec9: { value: [-1, 0, 0], label: 'tgtB' },
-            t: { value: Math.random(), label: 't', min: 0, max: 1 },
-            'f(…posA,…tgtA,…posB,…tgtB,t)': button((get) => {
-              return cameraControlsRef.current?.lerpLookAt(
-                ...get('lerpLookAt.vec6'),
-                ...get('lerpLookAt.vec7'),
-                ...get('lerpLookAt.vec8'),
-                ...get('lerpLookAt.vec9'),
-                get('lerpLookAt.t'),
-                true
-              )
-            })
-          },
-          { collapsed: true }
-        ),
+        // minDistance: { value: 0 },
+        // moveTo: folder(
+        //   {
+        //     vec1: { value: [3, 5, 2], label: 'vec' },
+        //     'moveTo(…vec)': button((get) => cameraControlsRef.current?.moveTo(...get('moveTo.vec1'), true))
+        //   },
+        //   { collapsed: true }
+        // ),
+        // 'fitToBox(mesh)': button(() => cameraControlsRef.current?.fitToBox(meshRef.current, true)),
+        // setPosition: folder(
+        //   {
+        //     vec2: { value: [-5, 2, 1], label: 'vec' },
+        //     'setPosition(…vec)': button((get) => cameraControlsRef.current?.setPosition(...get('setPosition.vec2'), true))
+        //   },
+        //   { collapsed: true }
+        // ),
+        // setTarget: folder(
+        //   {
+        //     vec3: { value: [3, 0, -3], label: 'vec' },
+        //     'setTarget(…vec)': button((get) => cameraControlsRef.current?.setTarget(...get('setTarget.vec3'), true))
+        //   },
+        //   { collapsed: true }
+        // ),
+        // setLookAt: folder(
+        //   {
+        //     vec4: { value: [1, 2, 3], label: 'position' },
+        //     vec5: { value: [1, 1, 0], label: 'target' },
+        //     'setLookAt(…position, …target)': button((get) => cameraControlsRef.current?.setLookAt(...get('setLookAt.vec4'), ...get('setLookAt.vec5'), true))
+        //   },
+        //   { collapsed: true }
+        // ),
+        // lerpLookAt: folder(
+        //   {
+        //     vec6: { value: [-2, 0, 0], label: 'posA' },
+        //     vec7: { value: [1, 1, 0], label: 'tgtA' },
+        //     vec8: { value: [0, 2, 5], label: 'posB' },
+        //     vec9: { value: [-1, 0, 0], label: 'tgtB' },
+        //     t: { value: Math.random(), label: 't', min: 0, max: 1 },
+        //     'f(…posA,…tgtA,…posB,…tgtB,t)': button((get) => {
+        //       return cameraControlsRef.current?.lerpLookAt(
+        //         ...get('lerpLookAt.vec6'),
+        //         ...get('lerpLookAt.vec7'),
+        //         ...get('lerpLookAt.vec8'),
+        //         ...get('lerpLookAt.vec9'),
+        //         get('lerpLookAt.t'),
+        //         true
+        //       )
+        //     })
+        //   },
+        //   { collapsed: true }
+        // ),
 
-        saveState: button(() => cameraControlsRef.current?.saveState()),
-        reset: button(() => {
-          cameraControlsRef.current?.reset(true);
-          console.log(cameraControlsRef.current)
-        }),
-        enabled: { value: true, label: 'controls on' },
-        verticalDragToForward: { value: false, label: 'vert. drag to move forward' },
-        dollyToCursor: { value: false, label: 'dolly to cursor' },
-        infinityDolly: { value: false, label: 'infinity dolly' },
+        // saveState: button(() => cameraControlsRef.current?.saveState()),
+        // reset: button(() => {
+        //   cameraControlsRef.current?.reset(true);
+        //   console.log(cameraControlsRef.current)
+        // }),
+        // enabled: { value: true, label: 'controls on' },
+        // verticalDragToForward: { value: false, label: 'vert. drag to move forward' },
+        // dollyToCursor: { value: false, label: 'dolly to cursor' },
+        // infinityDolly: { value: false, label: 'infinity dolly' },
       }),
 
 
@@ -115,14 +115,14 @@ function Scene() {
   })
 
 
-  useEffect(() => {
-    cameraControlsRef.current.setTarget(.45, .19, -0.4)
-    cameraControlsRef.current.setPosition(
-      0.8467222254632364,
-      0.3486523543220764,
-      -0.04093306919456041
-    )
-  }, [])
+  // useEffect(() => {
+  //   cameraControlsRef.current.setTarget(.45, .19, -0.4)
+  //   cameraControlsRef.current.setPosition(
+  //     0.8467222254632364,
+  //     0.3486523543220764,
+  //     -0.04093306919456041
+  //   )
+  // }, [])
 
   return (
     <>
@@ -171,6 +171,22 @@ const fabricData = [
     ratio: 0.6524946
   },
   {
+    name: "Buff_6518_41",
+    baseColor: "/Buff_6518_41_BaseColor.jpeg",
+    normal: "/Buff_6518_41_Normal.png",
+    roughness: "/Buff_6518_41_Roughness.jpeg",
+    scale: 8,
+    ratio: 0.6524946
+  },
+  {
+    name: "Buff_6518_491",
+    baseColor: "/Buff_6518_49_BaseColor.jpeg",
+    normal: "/Buff_6518_49_Normal.png",
+    roughness: "/Buff_6518_49_Roughness.jpeg",
+    scale: 8,
+    ratio: 0.6524946
+  },
+  {
     name: "Cycle_6227S",
     baseColor: "/Cycle_6227S_10_BaseColor.jpeg ",
     normal: " /Cycle_6227S_10_Normal.png",
@@ -179,6 +195,10 @@ const fabricData = [
     ratio: 0.6165312
   }
 ]
+
+
+// make a useControls select for each farbicdata
+
 
 const stichTypes = {
   "French Seam": ['French_Seam_1_BaseColor.jpg', 'French_Seam_1_Normal.png'],
@@ -193,10 +213,24 @@ const Model = () => {
   const [_colorMap, set_colorMap] = useState(stichTypes['Double Top Stitch'][0])
   const [_normalMap, set_normalMap] = useState(stichTypes['Double Top Stitch'][1])
 
+  const { fabric } = useControls({
+
+    fabric: {
+      options: {
+        Buff_6518_40: fabricData[0],
+        Buff_6518_41: fabricData[1],
+        Buff_6518_491: fabricData[2],
+        Cycle_6227S: fabricData[3],
+      }
+    }
+  })
+  console.log("🚀 ~ fabric:", fabric)
+
   const [colorMap, normalMap, roughnessMap, stColor, stNormal] = useTexture([
-    fabricData[0].baseColor,
-    fabricData[0].normal,
-    fabricData[0].roughness,
+
+    fabric.baseColor,
+    fabric.normal,
+    fabric.roughness,
     _colorMap, _normalMap
 
   ]
@@ -222,28 +256,16 @@ const Model = () => {
   }, [colorMap]);
 
 
-  const controls = useControls({
 
-    StandarMaterial: folder({
-      roughness: { value: 0.1, min: 0, max: 1, step: 0.01 },
-
-      envMapIntensity: { value: 1, min: 0, max: 1, step: 0.01 },
-      clearcoat: { value: 0, min: 0, max: 1, step: 0.01 },
-      clearcoatRoughness: { value: 0, min: 0, max: 1, step: 0.01 },
-      reflectivity: { value: 0, min: 0, max: 1, step: 0.01 },
-      refractionRatio: { value: 0, min: 0, max: 1, step: 0.01 },
-      clearcoatNormalScale: [0, 0]
-    }),
-  })
 
   const props = useMemo(() => {
     return {
       map: colorMap,
       normalMap,
       roughnessMap,
-      controls
+
     }
-  }, [colorMap, normalMap, roughnessMap, controls])
+  }, [colorMap, normalMap, roughnessMap])
 
   const stProps = useMemo(() => {
     stNormal.generateMipmaps = false
