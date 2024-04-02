@@ -5,7 +5,7 @@ import { Canvas, useLoader, useThree } from '@react-three/fiber'
 import { Grid, Center, AccumulativeShadows, RandomizedLight, Environment, useGLTF, CameraControls, EnvironmentCube, SpotLight, Box, SoftShadows, useTexture } from '@react-three/drei'
 import { useControls, button, buttonGroup, folder } from 'leva'
 import { GLTFLoader, USDZExporter } from 'three-stdlib'
-import BaseFrame from './base/baseFrame'
+import BaseFrame from './base/BaseFrame'
 
 
 
