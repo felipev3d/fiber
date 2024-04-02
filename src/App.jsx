@@ -1,10 +1,11 @@
 
 import * as THREE from 'three'
-import { memo, useLayoutEffect, useMemo, useRef, useState } from 'react'
+import { memo, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import { Canvas, useLoader, useThree } from '@react-three/fiber'
 import { Grid, Center, AccumulativeShadows, RandomizedLight, Environment, useGLTF, CameraControls, EnvironmentCube, SpotLight, Box, SoftShadows, useTexture } from '@react-three/drei'
 import { useControls, button, buttonGroup, folder } from 'leva'
 import { GLTFLoader, USDZExporter } from 'three-stdlib'
+import BaseFrame from './base/baseFrame'
 
 
 
@@ -16,7 +17,7 @@ const { DEG2RAD } = THREE.MathUtils
 export default function App() {
   return (
     <>
-      <Canvas shadows camera={{ position: [0, 0, 5], fov: 60 }}>
+      <Canvas shadows camera={{ position: [0, 0, 1], fov: 20 }}>
 
         <Scene />
         <Model />
@@ -38,36 +39,7 @@ function Scene() {
     camera: folder(
       {
 
-        thetaGrp: buttonGroup({
-          label: 'rotate theta',
-          opts: {
-            '+45º': () => cameraControlsRef.current?.rotate(45 * DEG2RAD, 0, true),
-            '-90º': () => cameraControlsRef.current?.rotate(-90 * DEG2RAD, 0, true),
-            '+360º': () => cameraControlsRef.current?.rotate(360 * DEG2RAD, 0, true)
-          }
-        }),
-        phiGrp: buttonGroup({
-          label: 'rotate phi',
-          opts: {
-            '+20º': () => cameraControlsRef.current?.rotate(0, 20 * DEG2RAD, true),
-            '-40º': () => cameraControlsRef.current?.rotate(0, -40 * DEG2RAD, true)
-          }
-        }),
-        truckGrp: buttonGroup({
-          label: 'truck',
-          opts: {
-            '(1,0)': () => cameraControlsRef.current?.truck(1, 0, true),
-            '(0,1)': () => cameraControlsRef.current?.truck(0, 1, true),
-            '(-1,-1)': () => cameraControlsRef.current?.truck(-1, -1, true)
-          }
-        }),
-        dollyGrp: buttonGroup({
-          label: 'dolly',
-          opts: {
-            '1': () => cameraControlsRef.current?.dolly(1, true),
-            '-1': () => cameraControlsRef.current?.dolly(-1, true)
-          }
-        }),
+
         zoomGrp: buttonGroup({
           label: 'zoom',
           opts: {
@@ -128,7 +100,10 @@ function Scene() {
         ),
 
         saveState: button(() => cameraControlsRef.current?.saveState()),
-        reset: button(() => cameraControlsRef.current?.reset(true)),
+        reset: button(() => {
+          cameraControlsRef.current?.reset(true);
+          console.log(cameraControlsRef.current)
+        }),
         enabled: { value: true, label: 'controls on' },
         verticalDragToForward: { value: false, label: 'vert. drag to move forward' },
         dollyToCursor: { value: false, label: 'dolly to cursor' },
@@ -140,7 +115,14 @@ function Scene() {
   })
 
 
-
+  useEffect(() => {
+    cameraControlsRef.current.setTarget(.45, .19, -0.4)
+    cameraControlsRef.current.setPosition(
+      0.8467222254632364,
+      0.3486523543220764,
+      -0.04093306919456041
+    )
+  }, [])
 
   return (
     <>
@@ -181,10 +163,10 @@ function Ground() {
 
 const fabricData = [
   {
-    name: "Buff_6518_49",
-    baseColor: "/Buff_6518_49_BaseColor.jpeg",
-    normal: "/Buff_6518_49_Normal.png",
-    roughness: "/Buff_6518_49_Roughness.jpeg",
+    name: "Buff_6518_40",
+    baseColor: "/Buff_6518_40_BaseColor.jpeg",
+    normal: "/Buff_6518_40_Normal.png",
+    roughness: "/Buff_6518_40_Roughness.jpeg",
     scale: 8,
     ratio: 0.6524946
   },
@@ -253,7 +235,6 @@ const Model = () => {
       clearcoatNormalScale: [0, 0]
     }),
   })
-  { console.log('gltf,gltf,gltf', gltf.scene.children) }
 
   const props = useMemo(() => {
     return {
@@ -265,7 +246,7 @@ const Model = () => {
   }, [colorMap, normalMap, roughnessMap, controls])
 
   const stProps = useMemo(() => {
-
+    stNormal.generateMipmaps = false
     return {
       map: stColor,
       normalMap: stNormal,
@@ -281,8 +262,11 @@ const Model = () => {
     }
   }, [stColor, stNormal])
 
+
+
+
   return (
-    <group>
+    <group position={[0, -.5, 0]}>
       {
         gltf.scene.children.map((obj, index) => {
           return obj.isMesh
@@ -326,7 +310,7 @@ const Model = () => {
 
         })
       }
-
+      <BaseFrame />
     </group>
 
   )
