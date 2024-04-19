@@ -1,12 +1,14 @@
 import { useGLTF, useTexture } from '@react-three/drei'
 import { useControls } from 'leva'
-import React, { useRef } from 'react'
+import React, { useEffect, useRef } from 'react'
+import CustomMaterialComponent from './CustomMaterialComponent';
+import Triplannar from './Triplannar';
+
 
 function BaseFrame() {
     const meshRef = useRef()
 
     const base = useGLTF('base/A10_BS_T7_48x26x10.gltf')
-    console.log("🚀 ~ BaseFrame ~ base:",)
 
     const sliders = useControls(
         Object.keys(base.nodes.A10_BS_T7_48x26x10.children[0].morphTargetDictionary).reduce((acc, key) => {
@@ -14,7 +16,6 @@ function BaseFrame() {
             return acc
         }, {})
     )
-    console.log("🚀 ~ BaseFrame ~ sliders:", sliders)
 
     return (
         <group >
@@ -40,21 +41,36 @@ const Mesher = (mesh) => {
 
     const { sliders } = mesh
 
-  
+
     Object.keys(dict).forEach((key) => {
         mesh.morphTargetInfluences[dict[key]] = sliders[key]
     }
     )
 
+    const { scalex, scaley, scalez } = useControls(
+        {
+            scalex: { value: 1, min: 0, max: 2 },
+            scaley: { value: 1, min: 0, max: 2 },
+            scalez: { value: 1, min: 0, max: 2 }
+        }
+    )
+
 
     return (
-        <mesh ref={meshRef} morphTargetInfluences={mesh.morphTargetInfluences} geometry={mesh?.geometry}  >
-            <BaseMaterial />
+        <mesh ref={meshRef}
+            scale={[scalex, scaley, scalez]}
+            morphTargetInfluences={mesh.morphTargetInfluences}
+
+            geometry={mesh?.geometry}  >
+            <BaseMaterial meshRef={meshRef} />
+            {/* <CustomMaterialComponent morphTargetInfluences={mesh.morphTargetInfluences} /> */}
+
+            {/* <Triplannar /> */}
         </mesh>
     )
 }
 
-const BaseMaterial = () => {
+const BaseMaterial = ({ meshRef }) => {
     const { type } = useControls({
         type: {
             options: {
@@ -72,12 +88,35 @@ const BaseMaterial = () => {
     })
 
     const textures = useTexture(type)
+
+    useEffect(() => {
+        var uvAttribute = meshRef.current.geometry.attributes.uv;
+        uvAttribute.needsUpdate = true;
+
+
+        for (var i = 0; i < uvAttribute.count; i++) {
+
+            var u = uvAttribute.getX(i);
+            var v = uvAttribute.getY(i);
+
+            // do something with uv
+
+            // write values back to attribute
+
+            uvAttribute.setXY(i, u, v);
+
+        }
+    }, [type])
+
+
+
     return (
         <meshPhysicalMaterial
             map={textures[0]}
             normalMap={textures[1]}
             roughnessMap={textures[2]}
         />
+        // <CustomMaterialComponent />
     )
 }
 

@@ -17,7 +17,9 @@ const { DEG2RAD } = THREE.MathUtils
 export default function App() {
   return (
     <>
-      <Canvas shadows camera={{ position: [0, 0, 3], fov: 20 }}>
+      <Canvas
+        renderer={{ antialias: true }}
+        shadows camera={{ position: [0, 0, 3], fov: 20 }}>
 
         <Scene />
         <Model />
