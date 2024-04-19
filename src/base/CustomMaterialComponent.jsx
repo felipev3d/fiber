@@ -16,8 +16,11 @@ function CustomMaterialComponent({ morphTargetInfluences }) {
     const props = useMemo(() => {
         let shader;
         map.wrapS = map.wrapT = RepeatWrapping;
-
-        const onBeforeCompile = (s) => {
+        normalMap.wrapS = normalMap.wrapT = RepeatWrapping;
+        normalMap.rotation = Math.PI / 2;
+        roughnessMap.wrapS = roughnessMap.wrapT = RepeatWrapping;
+        roughnessMap.rotation = Math.PI / 2;
+        let onBeforeCompile = (s) => {
             s.vertexShader =
                 `
         varying vec3 vWorldPosition;

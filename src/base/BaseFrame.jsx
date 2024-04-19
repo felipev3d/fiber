@@ -62,8 +62,8 @@ const Mesher = (mesh) => {
             morphTargetInfluences={mesh.morphTargetInfluences}
 
             geometry={mesh?.geometry}  >
-            <BaseMaterial meshRef={meshRef} />
-            {/* <CustomMaterialComponent morphTargetInfluences={mesh.morphTargetInfluences} /> */}
+            {/* <BaseMaterial meshRef={meshRef} /> */}
+            <CustomMaterialComponent morphTargetInfluences={mesh.morphTargetInfluences} />
 
             {/* <Triplannar /> */}
         </mesh>
@@ -107,8 +107,6 @@ const BaseMaterial = ({ meshRef }) => {
 
         }
     }, [type])
-
-
 
     return (
         <meshPhysicalMaterial
