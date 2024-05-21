@@ -1,6 +1,7 @@
 import { useTexture } from '@react-three/drei'
 import React, { useMemo, useRef } from 'react'
 import { RepeatWrapping, ShaderChunk, Vector3 } from 'three'
+
 let injectChunk = (shader, seg, chunk, find, replace) => {
     let ck = ShaderChunk[chunk];
     shader[seg] = shader[seg].replace(
@@ -8,6 +9,7 @@ let injectChunk = (shader, seg, chunk, find, replace) => {
         ck.replace(find, replace)
     );
 };
+
 function CustomMaterialComponent({ morphTargetInfluences }) {
 
     const materialRef = useRef()
@@ -17,9 +19,10 @@ function CustomMaterialComponent({ morphTargetInfluences }) {
         let shader;
         map.wrapS = map.wrapT = RepeatWrapping;
         normalMap.wrapS = normalMap.wrapT = RepeatWrapping;
-        normalMap.rotation = Math.PI / 2;
+        // normalMap.rotation = Math.PI / 2;
         roughnessMap.wrapS = roughnessMap.wrapT = RepeatWrapping;
-        roughnessMap.rotation = Math.PI / 2;
+        // roughnessMap.rotation = Math.PI / 2;
+
         let onBeforeCompile = (s) => {
             s.vertexShader =
                 `
@@ -28,9 +31,18 @@ function CustomMaterialComponent({ morphTargetInfluences }) {
         varying vec3 vViewDirection;
             ` + s.vertexShader;
 
+            s.vertexShader = s.vertexShader.replace('#include <fog_vertex>', `
+#include <fog_vertex>
+#ifdef USE_MORPHTARGETS
+     vWorldPosition.xyz = transformed;  // Use the morph target "transformed" value
+     vWorldNormal.xyz = transformedNormal;
+    vViewDirection = cameraPosition - vWorldPosition;
+#endif
+`)
+
             s.fragmentShader =
                 `
-        uniform vec3 textureScale;
+        uniform vec3 textureScale; 
         
         varying vec3 vWorldPosition;
         varying vec3 vWorldNormal;
@@ -53,7 +65,6 @@ function CustomMaterialComponent({ morphTargetInfluences }) {
             `
             );
 
-
             injectChunk(
                 s,
                 "fragmentShader",
@@ -71,12 +82,16 @@ function CustomMaterialComponent({ morphTargetInfluences }) {
               uv = scaledCoords.xy;
           }
           vec4 sampledDiffuseColor = texture2D( map, uv );
+          vec3 normalColor = texture2D( normalMap, uv ).xyz * 2.0 - 1.0;
+          float roughnessValue = texture2D( roughnessMap, uv ).r;
     
           //vec4 sampledDiffuseColor `
             );
 
-            s.uniforms.textureScale = { value: new Vector3(1, 1, 1) };
-            shader = s;
+            const _sc = 1.2
+            s.uniforms.textureScale = { value: new Vector3(_sc, _sc, _sc) };
+            s.uniforms.normalMap = { value: normalMap };
+            s.uniforms.roughnessMap = { value: roughnessMap };
         };
 
         return {
@@ -86,7 +101,6 @@ function CustomMaterialComponent({ morphTargetInfluences }) {
             roughnessMap: roughnessMap,
             onBeforeCompile: onBeforeCompile,
             customProgramCacheKey: () => 456,
-
         }
 
     }, [map, normalMap, roughnessMap])
