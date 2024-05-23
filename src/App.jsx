@@ -131,8 +131,10 @@ function Scene() {
       <group position-y={-0.5}>
         {/* <Environment preset="studio" /> */}
         <Ground />
-        <pointLight position={[.7, .7, .7]} intensity={6} />
-        <ambientLight intensity={5} />
+        <pointLight position={[.7, .7, .7]} intensity={2} />
+        <pointLight position={[-.7, .2, .7]} intensity={2} />
+        <pointLight position={[0, .7, .7]} intensity={2} />
+        {/* <ambientLight intensity={3} /> */}
         <CameraControls
           ref={cameraControlsRef}
           minDistance={minDistance}

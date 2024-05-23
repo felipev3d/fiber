@@ -22,6 +22,15 @@ function BaseFrame() {
             {
                 base.nodes.A10_BS_T7_48x26x10.children.map((child, index) => <Mesher key={index} sliders={sliders} {...child} />)
             }
+            <mesh
+            castShadow={true}   
+            receiveShadow={true}    
+            >
+                <planeGeometry args={[1, 1]}
+                
+                
+                />
+            </mesh>
         </group >
     )
 }
@@ -60,7 +69,8 @@ const Mesher = (mesh) => {
         <mesh ref={meshRef}
             scale={[scalex, scaley, scalez]}
             morphTargetInfluences={mesh.morphTargetInfluences}
-
+            castShadow={true}
+            receiveShadow={true}
             geometry={mesh?.geometry}  >
             {/* <BaseMaterial meshRef={meshRef} /> */}
             <CustomMaterialComponent morphTargetInfluences={mesh.morphTargetInfluences} />
