@@ -37,7 +37,7 @@ function CustomMaterialComponent({ morphTargetInfluences }) {
      vWorldPosition.xyz = transformed;  // Use the morph target "transformed" value
      vWorldNormal.xyz = transformedNormal;
     vViewDirection = cameraPosition - vWorldPosition;
-#endif
+#endif 
 `)
 
             s.fragmentShader =
@@ -81,11 +81,34 @@ function CustomMaterialComponent({ morphTargetInfluences }) {
           } else {
               uv = scaledCoords.xy;
           }
-          vec4 sampledDiffuseColor = texture2D( map, uv );
-          vec3 normalColor = texture2D( normalMap, uv ).xyz * 2.0 - 1.0;
-          float roughnessValue = texture2D( roughnessMap, uv ).r;
-    
+          vec4 sampledDiffuseColor = texture2D( map, uv );            
           //vec4 sampledDiffuseColor `
+            );
+            injectChunk(
+                s,
+                "fragmentShader",
+                "roughnessmap_fragment",
+                `vec4 texelRoughness
+                float roughnessFactor = roughness; `,
+                `
+                
+          vec4 texelRoughness = texture2D( roughnessMap, uv );
+          roughnessFactor *= texelRoughness.g;`
+            );
+
+
+            injectChunk(
+                s,
+                "fragmentShader",
+                "normal_fragment_maps",
+                `
+                //vec4 texelRoughness
+                // float roughnessFactor = roughness; `,
+                `
+                
+                normal = texture2D( normalMap, uv ).xyz * 2.0 - 1.0;
+                normal = normalize( normalMatrix * normal );
+          `
             );
 
             const _sc = 1.2
