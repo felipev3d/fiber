@@ -6,6 +6,7 @@ import { Grid, Center, AccumulativeShadows, RandomizedLight, Environment, useGLT
 import { useControls, button, buttonGroup, folder } from 'leva'
 import { GLTFLoader, USDZExporter } from 'three-stdlib'
 import BaseFrame from './base/BaseFrame'
+import GlbLoader from './GlbLoader'
 
 
 
@@ -13,16 +14,27 @@ const { DEG2RAD } = THREE.MathUtils
 
 
 
-
 export default function App() {
+  const { rotation } = useControls({
+    rotation: { value: 0, label: 'rotation', min: -180, max: 180, step: 1, },
+  })
+
   return (
     <>
       <Canvas
         renderer={{ antialias: true }}
-        shadows camera={{ position: [0, 0, 3], fov: 20 }}>
+        shadows camera={{ position: [0, 0, 3], fov: 20 }}
+      >
+        <group position-y={-0.5}>
 
-        <Scene />
-        <Model />
+          <Ground />
+        </group>
+
+        <group rotation={[0, DEG2RAD * rotation, 0]}>
+
+          <Scene />
+          <Model />
+        </group>
 
       </Canvas >
     </>
@@ -130,11 +142,21 @@ function Scene() {
     <>
       <group position-y={-0.5}>
         {/* <Environment preset="studio" /> */}
-        <Ground />
-        <pointLight position={[.7, .7, .7]} intensity={2} />
-        <pointLight position={[-.7, .2, .7]} intensity={2} />
-        <pointLight position={[0, .7, .7]} intensity={2} />
-        {/* <ambientLight intensity={3} /> */}
+
+        <group
+          position={[1.5, 0, 0]}
+        // rotation={[0, DEG2RAD * rotation, 0]}
+        >
+
+
+          <GlbLoader />
+        </group>
+        <pointLight
+          castShadow
+          position={[1.1, .1, .7]} intensity={2} />
+        <pointLight castShadow position={[-.7, .2, .7]} intensity={2} />
+        {/* <pointLight   castShadow position={[0, .7, .7]} intensity={2} /> */}
+        <ambientLight intensity={2.0} />
         <CameraControls
           ref={cameraControlsRef}
           minDistance={minDistance}

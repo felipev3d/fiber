@@ -3,6 +3,7 @@ import { useControls } from 'leva'
 import React, { useEffect, useRef } from 'react'
 import CustomMaterialComponent from './CustomMaterialComponent';
 import Triplannar from './Triplannar';
+import { FrontSide } from 'three';
 
 
 function BaseFrame() {
@@ -18,18 +19,25 @@ function BaseFrame() {
     )
 
     return (
-        <group >
+        <group
+            castShadow={true}
+            receiveShadow={true}
+        >
             {
                 base.nodes.A10_BS_T7_48x26x10.children.map((child, index) => <Mesher key={index} sliders={sliders} {...child} />)
             }
             <mesh
-            castShadow={true}   
-            receiveShadow={true}    
+                castShadow={true}
+                receiveShadow={true}
+                position={[-.5, .4, .2]}
             >
-                <planeGeometry args={[1, 1]}
-                
-                
-                />
+                <sphereGeometry args={[.1, 32, 32]} />
+                castShadow={true}
+                receiveShadow={true}
+
+                args={[.1, .1, .1]}
+
+                <meshPhysicalMaterial color={'pink'} />
             </mesh>
         </group >
     )
@@ -69,12 +77,17 @@ const Mesher = (mesh) => {
         <mesh ref={meshRef}
             scale={[scalex, scaley, scalez]}
             morphTargetInfluences={mesh.morphTargetInfluences}
-            castShadow={true}
-            receiveShadow={true}
+            castShadow = {true}
+            receiveShadow = {true}
+
             geometry={mesh?.geometry}  >
             {/* <BaseMaterial meshRef={meshRef} /> */}
             <CustomMaterialComponent morphTargetInfluences={mesh.morphTargetInfluences} />
-
+            {/* <meshPhysicalMaterial
+            
+           
+                map={useTexture('Oak_Rift_Dark_1_BaseColor.jpg')} */}
+            />
             {/* <Triplannar /> */}
         </mesh>
     )
