@@ -1,6 +1,7 @@
 import { useTexture } from '@react-three/drei'
 import React, { useMemo, useRef } from 'react'
 import { FrontSide, RepeatWrapping, ShaderChunk, Vector3 } from 'three'
+import { roughness } from 'three/examples/jsm/nodes/Nodes.js';
 
 let injectChunk = (shader, seg, chunk, find, replace) => {
     let ck = ShaderChunk[chunk];
@@ -103,14 +104,16 @@ vec4 texelRoughness = texture2D( roughnessMap, uv );
 roughnessFactor *= texelRoughness.g;  //`
     );
 
+    
+
     injectChunk( // PATCH NORMALMAP FRAGMENT
       s,
       "fragmentShader",
       "normal_fragment_maps",
       `#elif defined( USE_NORMALMAP_TANGENTSPACE )`,
       `
-#elif defined( USE_NORMALMAP_TANGENTSPACE )
-vec2 vNormalMapUv = uv;
+      #elif defined( USE_NORMALMAP_TANGENTSPACE )
+    vec2 vNormalMapUv = uv;
 `
     );
 }
@@ -118,21 +121,25 @@ vec2 vNormalMapUv = uv;
 function CustomMaterialComponent({ morphTargetInfluences }) {
 
     const materialRef = useRef()
-    const [map, normalMap, roughnessMap] = useTexture(['Oak_Rift_Dark_1_BaseColor.jpg', 'Oak_Rift_Dark_1_Normal.png', 'Oak_Rift_Dark_1_Roughness.jpg'])
+    const [map, normalMap, roughnessMap] = useTexture(
+        // ['Oak_Rift_Dark_1_BaseColor.jpg', 'Oak_Rift_Dark_1_Normal.png', 'Oak_Rift_Dark_1_Roughness.jpg']
+        ['001_BaseColor.webp', '001_Normal.webp', '001_Roughness.webp']
+        // ['001_BaseColor.jpeg', '001_Normal.png', '001_Roughness.jpeg']
+    )
 
     const props = useMemo(() => {
         let shader;
         map.wrapS = map.wrapT = RepeatWrapping;
         normalMap.wrapS = normalMap.wrapT = RepeatWrapping;
         roughnessMap.wrapS = roughnessMap.wrapT = RepeatWrapping;
-        //map.rotation = Math.PI *.25;
-        map.repeat.set(1,2);
-        normalMap.repeat.set(1,2);
-        roughnessMap.repeat.set(1,2);
+        // map.rotation = Math.PI *.25;
+        map.repeat.set(1,1);
+        normalMap.repeat.set(1,1);
+        roughnessMap.repeat.set(1,1);
 
         map.rotation = Math.PI /2;
-        normalMap.rotation = Math.PI /2;
-        roughnessMap.rotation = Math.PI /2;
+        // normalMap.rotation = Math.PI /2;
+        // roughnessMap.rotation = Math.PI /2;
 
         
         let onBeforeCompile = obc;
@@ -142,6 +149,7 @@ function CustomMaterialComponent({ morphTargetInfluences }) {
             map: map,
             normalMap: normalMap,
             roughnessMap: roughnessMap,
+            roughness: 1.0,
             onBeforeCompile: onBeforeCompile,
             customProgramCacheKey: () => 456,
         }

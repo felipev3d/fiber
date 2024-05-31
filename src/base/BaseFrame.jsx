@@ -9,10 +9,11 @@ import { FrontSide } from 'three';
 function BaseFrame() {
     const meshRef = useRef()
 
-    const base = useGLTF('base/A10_BS_T7_48x26x10.gltf')
+    const base = useGLTF('base/A10_BS_T4_48x26x10.glb')
+    console.log("🚀 ~ BaseFrame ~ base:", base)
 
     const sliders = useControls(
-        Object.keys(base.nodes.A10_BS_T7_48x26x10.children[0].morphTargetDictionary).reduce((acc, key) => {
+        Object.keys(base.nodes.A10_BS_T4_48x26x10.children[0].morphTargetDictionary).reduce((acc, key) => {
             acc[key] = { value: 0, min: 0, max: 10 } // Define each slider
             return acc
         }, {})
@@ -22,9 +23,11 @@ function BaseFrame() {
         <group
             castShadow={true}
             receiveShadow={true}
+            position-y={0.16 }
+            position-z={0.09}
         >
             {
-                base.nodes.A10_BS_T7_48x26x10.children.map((child, index) => <Mesher key={index} sliders={sliders} {...child} />)
+                base.nodes.A10_BS_T4_48x26x10.children.map((child, index) => <Mesher key={index} sliders={sliders} {...child} />)
             }
             <mesh
                 castShadow={true}
@@ -45,14 +48,15 @@ function BaseFrame() {
 
 
 const Mesher = (mesh) => {
+    console.log("🚀 ~ Mesher ~ mesh:", mesh)
     const dict = {
         "Y1": 0,
-        "Y1A": 1,
-        "Y0": 2,
-        "X1R": 3,
-        "X1L": 4,
-        "Z1": 5,
-        "Z11": 6
+        "Y11": 1,
+        "Y1a0": 2,
+        "Y0": 3,
+        "Z1": 4,
+        "X1R": 5,
+        "X1L": 6
     }
     const meshRef = useRef()
 
@@ -77,8 +81,8 @@ const Mesher = (mesh) => {
         <mesh ref={meshRef}
             scale={[scalex, scaley, scalez]}
             morphTargetInfluences={mesh.morphTargetInfluences}
-            castShadow = {true}
-            receiveShadow = {true}
+            castShadow={true}
+            receiveShadow={true}
 
             geometry={mesh?.geometry}  >
             {/* <BaseMaterial meshRef={meshRef} /> */}
@@ -87,7 +91,7 @@ const Mesher = (mesh) => {
             
            
                 map={useTexture('Oak_Rift_Dark_1_BaseColor.jpg')} */}
-            />
+
             {/* <Triplannar /> */}
         </mesh>
     )
