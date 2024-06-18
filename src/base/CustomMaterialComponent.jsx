@@ -1,6 +1,6 @@
 import { useTexture } from '@react-three/drei'
 import React, { useMemo, useRef } from 'react'
-import { FrontSide, RepeatWrapping, ShaderChunk, Vector3 } from 'three'
+import { BackSide, FrontSide, NoColorSpace, RepeatWrapping, ShaderChunk, Vector3 } from 'three'
 import { roughness } from 'three/examples/jsm/nodes/Nodes.js';
 
 let injectChunk = (shader, seg, chunk, find, replace) => {
@@ -101,7 +101,10 @@ let obc=(s)=>{
       `vec4 texelRoughness`,
       `
 vec4 texelRoughness = texture2D( roughnessMap, uv );
-roughnessFactor *= texelRoughness.g;  //`
+// roughnessFactor *= texelRoughness.g* 9.;
+roughnessFactor  = (3./texelRoughness.g) * texelRoughness.g;  //`
+
+
     );
 
     
@@ -113,7 +116,7 @@ roughnessFactor *= texelRoughness.g;  //`
       `#elif defined( USE_NORMALMAP_TANGENTSPACE )`,
       `
       #elif defined( USE_NORMALMAP_TANGENTSPACE )
-    vec2 vNormalMapUv = uv;
+    vec2 vNormalMapUv =  uv   ; 
 `
     );
 }
@@ -123,43 +126,44 @@ function CustomMaterialComponent({ morphTargetInfluences }) {
     const materialRef = useRef()
     const [map, normalMap, roughnessMap] = useTexture(
         // ['Oak_Rift_Dark_1_BaseColor.jpg', 'Oak_Rift_Dark_1_Normal.png', 'Oak_Rift_Dark_1_Roughness.jpg']
-        ['001_BaseColor.webp', '001_Normal.webp', '001_Roughness.webp']
+        ['https://apistorage.v2fineinteriors.app/material/Walnut_Quarter_Natural_1_BaseColor.jpg',
+            'https://apistorage.v2fineinteriors.app/material/Walnut_Quarter_Natural_1_Normal.png',
+            'https://apistorage.v2fineinteriors.app/material/Walnut_Quarter_Natural_1_Roughness.jpg'
+        
+        ]
         // ['001_BaseColor.jpeg', '001_Normal.png', '001_Roughness.jpeg']
     )
 
     const props = useMemo(() => {
         let shader;
+        normalMap.colorSpace = NoColorSpace;
+        roughnessMap.colorSpace = NoColorSpace;
         map.wrapS = map.wrapT = RepeatWrapping;
         normalMap.wrapS = normalMap.wrapT = RepeatWrapping;
-        roughnessMap.wrapS = roughnessMap.wrapT = RepeatWrapping;
-        // map.rotation = Math.PI *.25;
-        map.repeat.set(1,1);
-        normalMap.repeat.set(1,1);
-        roughnessMap.repeat.set(1,1);
-
-        map.rotation = Math.PI /2;
-        // normalMap.rotation = Math.PI /2;
-        // roughnessMap.rotation = Math.PI /2;
-
+        roughnessMap.wrapS = roughnessMap.wrapT = RepeatWrapping; 
+        map.repeat.set(2,2); 
+        roughnessMap.repeat.set(2,2);
+ 
         
         let onBeforeCompile = obc;
           
         return {
-            ref: materialRef,
+            ref: materialRef,           
             map: map,
             normalMap: normalMap,
-            roughnessMap: roughnessMap,
-            roughness: 1.0,
+            roughnessMap: roughnessMap,  
             onBeforeCompile: onBeforeCompile,
-            customProgramCacheKey: () => 456,
-        }
+              }
 
     }, [map, normalMap, roughnessMap])
 
     return (
         <meshPhysicalMaterial
-            {...props}
-            side={FrontSide}
+        key={() => Math.random()} // Unique key to force re-render
+         receiveShadow={true}
+         castShadow={true}
+          
+            {...props} 
         />
     )
 }
